@@ -3,9 +3,9 @@ using System.Collections;
 
 public class World {
 
-	public readonly int WorldSizeX = 10;
-	public readonly int WorldSizeY = 5;
-	public readonly int WorldSizeZ = 10;
+	public readonly int WorldSizeX = 16;
+	public readonly int WorldSizeY = 16;
+	public readonly int WorldSizeZ = 16;
 
 	public int[,,] WorldArray;
 
