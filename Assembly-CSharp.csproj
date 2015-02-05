@@ -46,6 +46,10 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Block.cs" />
+     <Compile Include="Assets\BlockAir.cs" />
+     <Compile Include="Assets\Chunk.cs" />
+     <Compile Include="Assets\MeshData.cs" />
      <Compile Include="Assets\World.cs" />
      <Compile Include="Assets\WorldGen.cs" />
      <Compile Include="Assets\WorldRender.cs" />
