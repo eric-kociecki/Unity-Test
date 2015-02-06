@@ -7,65 +7,32 @@ using System.Collections;
 
 public class Chunk : MonoBehaviour
 {
-
-    Block[, ,] blocks;
     public static int chunkSize = 16;
     public bool update = true;
 
     MeshFilter filter;
     MeshCollider coll;
 
-    World world;
-    WorldGen worldGen;
+    public World world; // must be set before Start() runs
+
+    public int chunkX; // all 3 of these must be set before Start() runs. Use SetChunkCoordinates()
+    public int chunkY;
+    public int chunkZ;
 
     // Use this for initialization
     void Start()
     {
-
         filter = gameObject.GetComponent<MeshFilter>();
         coll = gameObject.GetComponent<MeshCollider>();
 
-        //past here is just to set up an example chunk
-        world = new World();
-        worldGen = new WorldGen(world);
-
-        blocks = new Block[chunkSize, chunkSize, chunkSize];
-
-        for (int x = 0; x < chunkSize; x++)
-        {
-            for (int y = 0; y < chunkSize; y++)
-            {
-                for (int z = 0; z < chunkSize; z++)
-                {
-                    if (world.WorldArray[x, y, z] > 0)
-                    {
-                        blocks[x, y, z] = new Block();
-                    }
-                    else
-                    {
-                        blocks[x, y, z] = new BlockAir();
-                    }
-                }
-            }
-        }
-
-        /*for (int x = 1; x < chunkSize - 1; x++)
-        {
-            for (int y = 1; y < chunkSize - 1; y++)
-            {
-                for (int z = 1; z < chunkSize - 1; z++)
-                {
-                    if (world.WorldArray[x, y, z] > 0)
-                    {
-                        blocks[x, y, z] = new Block();
-                    }
-                }
-            }
-        }*/
-
-        
-
         UpdateChunk();
+    }
+
+    public void SetChunkCoordinates(int x, int y, int z)
+    {
+        chunkX = x;
+        chunkY = y;
+        chunkZ = z;
     }
 
     //Update is called once per frame
@@ -74,19 +41,20 @@ public class Chunk : MonoBehaviour
 
     }
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(Vector3 local)
     {
-        if ((x < 0) || (x > world.WorldSizeX - 1) ||
-            (y < 0) || (y > world.WorldSizeY - 1) ||
-            (z < 0) || (z > world.WorldSizeZ - 1))
-        {
-            return new BlockAir();
-        }
-        return blocks[x, y, z];
+        return world.GetBlock(ConvertToAbsolute(local));
+    }
+
+    public Block GetBlock(int localX, int localY, int localZ)
+    {
+        return world.GetBlock((chunkX * chunkSize) + localX,
+                              (chunkY * chunkSize) + localY,
+                              (chunkZ * chunkSize) + localZ);
     }
 
     // Updates the chunk based on its contents
-    void UpdateChunk()
+    public void UpdateChunk()
     {
         MeshData meshData = new MeshData();
 
@@ -96,12 +64,23 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    meshData = blocks[x, y, z].Blockdata(this, x, y, z, meshData);
+                    meshData = GetBlock(x, y, z).Blockdata(this,
+                                                           (chunkX * chunkSize) + x,
+                                                           (chunkY * chunkSize) + y,
+                                                           (chunkZ * chunkSize) + z,
+                                                           meshData);
                 }
             }
         }
 
         RenderMesh(meshData);
+    }
+
+    Vector3 ConvertToAbsolute(Vector3 local)
+    {
+        return new Vector3((chunkX * chunkSize) + local.x,
+                           (chunkY * chunkSize) + local.y,
+                           (chunkZ * chunkSize) + local.z);
     }
 
     // Sends the calculated mesh information
