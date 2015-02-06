@@ -37,12 +37,19 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    blocks[x, y, z] = new BlockAir();
+                    if (world.WorldArray[x, y, z] > 0)
+                    {
+                        blocks[x, y, z] = new Block();
+                    }
+                    else
+                    {
+                        blocks[x, y, z] = new BlockAir();
+                    }
                 }
             }
         }
 
-        for (int x = 1; x < chunkSize - 1; x++)
+        /*for (int x = 1; x < chunkSize - 1; x++)
         {
             for (int y = 1; y < chunkSize - 1; y++)
             {
@@ -54,7 +61,7 @@ public class Chunk : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
 
         
 
@@ -69,6 +76,12 @@ public class Chunk : MonoBehaviour
 
     public Block GetBlock(int x, int y, int z)
     {
+        if ((x < 0) || (x > world.WorldSizeX - 1) ||
+            (y < 0) || (y > world.WorldSizeY - 1) ||
+            (z < 0) || (z > world.WorldSizeZ - 1))
+        {
+            return new BlockAir();
+        }
         return blocks[x, y, z];
     }
 
