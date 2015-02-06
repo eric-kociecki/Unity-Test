@@ -12,6 +12,9 @@ public class Chunk : MonoBehaviour
 
     MeshFilter filter;
     MeshCollider coll;
+	MeshRenderer renderer;
+
+	public Material material;
 
     public World world; // must be set before Start() runs
 
@@ -24,6 +27,7 @@ public class Chunk : MonoBehaviour
     {
         filter = gameObject.GetComponent<MeshFilter>();
         coll = gameObject.GetComponent<MeshCollider>();
+		renderer = gameObject.GetComponent<MeshRenderer>();
 
         UpdateChunk();
     }
@@ -69,6 +73,7 @@ public class Chunk : MonoBehaviour
                                                            (chunkY * chunkSize) + y,
                                                            (chunkZ * chunkSize) + z,
                                                            meshData);
+
                 }
             }
         }
@@ -90,6 +95,7 @@ public class Chunk : MonoBehaviour
         filter.mesh.Clear();
         filter.mesh.vertices = meshData.vertices.ToArray();
         filter.mesh.triangles = meshData.triangles.ToArray();
+		filter.mesh.uv = meshData.uv.ToArray();
 
         coll.sharedMesh = null;
         Mesh mesh = new Mesh();
@@ -98,6 +104,8 @@ public class Chunk : MonoBehaviour
         mesh.RecalculateNormals();
 
         coll.sharedMesh = mesh;
+
+		renderer.material = world.blockColors;
     }
 
 }

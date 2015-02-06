@@ -71,6 +71,20 @@ public class Block
 
     }
 
+	protected MeshData SharedFaceData(MeshData meshData)
+	{
+		meshData.AddQuadTriangles();
+
+		Vector2 color = new Vector2((Random.value / 10) + 0.25f,
+		                            (Random.value / 10) + 0.7f);
+		meshData.AddUVCoord(color);
+		meshData.AddUVCoord(color);
+		meshData.AddUVCoord(color);
+		meshData.AddUVCoord(color);
+		
+		return meshData;
+	}
+
     protected virtual MeshData FaceDataUp
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
@@ -79,8 +93,8 @@ public class Block
         meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
         meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
 
-        meshData.AddQuadTriangles();
-
+        //meshData.AddQuadTriangles();
+		SharedFaceData (meshData);
         return meshData;
     }
 
@@ -92,7 +106,7 @@ public class Block
         meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
         meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
 
-        meshData.AddQuadTriangles();
+		SharedFaceData (meshData);
         return meshData;
     }
 
@@ -104,7 +118,7 @@ public class Block
         meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
         meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
 
-        meshData.AddQuadTriangles();
+		SharedFaceData (meshData);
         return meshData;
     }
 
@@ -116,7 +130,7 @@ public class Block
         meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
         meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
 
-        meshData.AddQuadTriangles();
+		SharedFaceData (meshData);
         return meshData;
     }
 
@@ -128,7 +142,7 @@ public class Block
         meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
         meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
 
-        meshData.AddQuadTriangles();
+		SharedFaceData (meshData);
         return meshData;
     }
 
@@ -140,7 +154,7 @@ public class Block
         meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
         meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
 
-        meshData.AddQuadTriangles();
+		SharedFaceData (meshData);
         return meshData;
     }
 

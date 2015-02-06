@@ -13,9 +13,13 @@ public class World : MonoBehaviour
 
     WorldGen worldGen; // this class generates the world
 
+	public Material blockColors;
+
 	// Use this for initialization
 	void Start ()
     {
+		blockColors = Resources.Load<Material>("hsv");
+
         worldGen = new WorldGen(this);
 
         ConvertBlockTypesToBlockData();

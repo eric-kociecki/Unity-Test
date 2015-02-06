@@ -36,6 +36,11 @@ public class MeshData
         }
     }
 
+	public void AddUVCoord(Vector2 coord)
+	{
+		uv.Add (coord);
+	}
+
     public void AddVertex(Vector3 vertex)
     {
         vertices.Add(vertex);
