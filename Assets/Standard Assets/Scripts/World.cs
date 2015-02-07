@@ -64,7 +64,14 @@ public class World : MonoBehaviour
                 {
                     if (WorldArray[x, y, z] > 0)
                     {
-                        blocks[x, y, z] = new Block();
+						if (y == 1) 
+						{
+							blocks[x, y, z] = new BlockStone();
+						}
+						else
+						{
+                        	blocks[x, y, z] = new Block();
+						}
                     }
                     else
                     {

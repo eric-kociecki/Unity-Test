@@ -71,7 +71,7 @@ public class Block
 
     }
 
-	protected MeshData SharedFaceData(MeshData meshData)
+	public virtual MeshData SharedFaceData(MeshData meshData)
 	{
 		meshData.AddQuadTriangles();
 
