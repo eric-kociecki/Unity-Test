@@ -44,17 +44,17 @@ public class Chunk : MonoBehaviour
     {
 
     }
-
-    public Block GetBlock(Vector3 local)
+    
+    /// <summary>
+    /// Returns the block object at the given coordinates. This must use absolute coords because it is sometimes calles from outside of Chunk in code that only knows absolute coords.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    public Block GetBlock(int x, int y, int z)
     {
-        return world.GetBlock(ConvertToAbsolute(local));
-    }
-
-    public Block GetBlock(int localX, int localY, int localZ)
-    {
-        return world.GetBlock((chunkX * chunkSize) + localX,
-                              (chunkY * chunkSize) + localY,
-                              (chunkZ * chunkSize) + localZ);
+        return world.GetBlock(x, y, z);
     }
 
     // Updates the chunk based on its contents
@@ -68,12 +68,11 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    meshData = GetBlock(x, y, z).Blockdata(this,
-                                                           (chunkX * chunkSize) + x,
-                                                           (chunkY * chunkSize) + y,
-                                                           (chunkZ * chunkSize) + z,
-                                                           meshData);
-
+                    meshData = GetBlock(ConvertXToAbsolute(x), ConvertYToAbsolute(y), ConvertZToAbsolute(z)).Blockdata(this,
+                                                                                                                       ConvertXToAbsolute(x),
+                                                                                                                       ConvertYToAbsolute(y),
+                                                                                                                       ConvertZToAbsolute(z),
+                                                                                                                       meshData);
                 }
             }
         }
@@ -81,11 +80,19 @@ public class Chunk : MonoBehaviour
         RenderMesh(meshData);
     }
 
-    Vector3 ConvertToAbsolute(Vector3 local)
+    protected int ConvertXToAbsolute(int localX)
     {
-        return new Vector3((chunkX * chunkSize) + local.x,
-                           (chunkY * chunkSize) + local.y,
-                           (chunkZ * chunkSize) + local.z);
+        return (chunkX * chunkSize) + localX;
+    }
+
+    protected int ConvertYToAbsolute(int localY)
+    {
+        return (chunkY * chunkSize) + localY;
+    }
+
+    protected int ConvertZToAbsolute(int localZ)
+    {
+        return (chunkZ * chunkSize) + localZ;
     }
 
     // Sends the calculated mesh information
@@ -96,6 +103,7 @@ public class Chunk : MonoBehaviour
         filter.mesh.vertices = meshData.vertices.ToArray();
         filter.mesh.triangles = meshData.triangles.ToArray();
 		filter.mesh.uv = meshData.uv.ToArray();
+        filter.mesh.RecalculateNormals();
 
         coll.sharedMesh = null;
         Mesh mesh = new Mesh();

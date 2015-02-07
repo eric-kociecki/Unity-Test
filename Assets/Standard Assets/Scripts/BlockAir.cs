@@ -19,4 +19,9 @@ public class BlockAir : Block
     {
         return false;
     }
+
+    public override string ToString()
+    {
+        return "block air";
+    }
 }

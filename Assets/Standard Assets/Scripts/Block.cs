@@ -158,4 +158,9 @@ public class Block
         return meshData;
     }
 
+    public virtual string ToString()
+    {
+        return "block";
+    }
+
 }

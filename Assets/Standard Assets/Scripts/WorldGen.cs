@@ -4,7 +4,7 @@ using System.Collections;
 
 public class WorldGen
 {
-	System.Random rnd = new System.Random();
+	System.Random rnd = new System.Random(1);
 	public World world;
 
 	public WorldGen(World newWorld)
@@ -34,6 +34,7 @@ public class WorldGen
 			for (int z = 0; z < world.WorldSizeZ; z++)
 			{
 				world.WorldArray[x,0,z] = 1;
+                //world.WorldArray[x, 1, z] = 1;
 				for (int y = 1; y < world.WorldSizeY; y++)
 				{
 					if (world.WorldArray[x,y-1,z] > 0)
@@ -55,6 +56,12 @@ public class WorldGen
 				}
 			}
 		}
+        /*world.WorldArray[17, 1, 3] = 1;
+        world.WorldArray[17, 1, 4] = 1;
+        world.WorldArray[17, 1, 2] = 1;
+        world.WorldArray[18, 1, 3] = 1;
+        world.WorldArray[16, 1, 3] = 1;
+        world.WorldArray[17, 2, 3] = 1;*/
 	}
 
 	// Update is called once per frame

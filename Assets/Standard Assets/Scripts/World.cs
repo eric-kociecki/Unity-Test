@@ -3,9 +3,9 @@ using System.Collections;
 
 public class World : MonoBehaviour
 {
-	public readonly int WorldSizeX = 32; // Edit these to adjust world size, setting them to something other than
+	public readonly int WorldSizeX = 64; // Edit these to adjust world size, setting them to something other than
 	public readonly int WorldSizeY = 32; // a multiple of Chunk.chunkSize is untested.
-	public readonly int WorldSizeZ = 32;
+	public readonly int WorldSizeZ = 64;
 
 	public int[,,] WorldArray; // used by current WorldGen, but should be replaced by usage of blocks array
     Block[, ,] blocks; // used by chunk / mesh system
@@ -28,19 +28,19 @@ public class World : MonoBehaviour
 
     void GenerateChunks()
     {
-        int chunkSizeX = WorldSizeX / Chunk.chunkSize;
-        int chunkSizeY = WorldSizeY / Chunk.chunkSize;
-        int chunkSizeZ = WorldSizeZ / Chunk.chunkSize;
+        int numChunksX = WorldSizeX / Chunk.chunkSize;
+        int numChunksY = WorldSizeY / Chunk.chunkSize;
+        int numChunksZ = WorldSizeZ / Chunk.chunkSize;
+        
+        chunks = new Chunk[numChunksX,
+                           numChunksY,
+                           numChunksZ];
 
-        chunks = new Chunk[WorldSizeX / Chunk.chunkSize,
-                           WorldSizeY / Chunk.chunkSize,
-                           WorldSizeZ / Chunk.chunkSize];
-
-        for (int x = 0; x < chunkSizeX; x++)
+        for (int x = 0; x < numChunksX; x++)
         {
-            for (int y = 0; y < chunkSizeY; y++)
+            for (int y = 0; y < numChunksY; y++)
             {
-                for (int z = 0; z < chunkSizeZ; z++)
+                for (int z = 0; z < numChunksZ; z++)
                 {
                     GameObject go = new GameObject("Chunk" + x + "," + y + "," + z);
                     chunks[x, y, z] = go.AddComponent<Chunk>();
@@ -73,11 +73,6 @@ public class World : MonoBehaviour
                 }
             }
         }
-    }
-
-    public Block GetBlock(Vector3 coords)
-    {
-        return GetBlock((int)coords.x, (int)coords.y, (int)coords.z);
     }
 
     public Block GetBlock(int x, int y, int z)
