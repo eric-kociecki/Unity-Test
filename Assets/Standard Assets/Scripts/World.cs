@@ -70,7 +70,7 @@ public class World : MonoBehaviour
 						}
 						else
 						{
-                        	blocks[x, y, z] = new Block();
+                        	blocks[x, y, z] = new Dirt();
 						}
                     }
                     else

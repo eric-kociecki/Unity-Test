@@ -1,14 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+///                           Top
+///     G--------H             ^  7 North
+///    /|       /|             | /
+///   / |      / |             |/
+///  C--------D  |   West <----+----> East
+///  |  E-----|--F            /|
+///  | /      | /            / |
+///  |/       |/      South L  V
+///  A--------B              Bottom
+///
+/// </summary>
 public class Block
 {
     public enum Direction { north, east, south, west, up, down };
 
+    protected Vector2 colorUV;
+
     //Base block constructor
     public Block()
     {
-
+        colorUV = new Vector2(0, 0);
     }
 
     public virtual bool IsSolid(Direction direction)
@@ -30,6 +44,46 @@ public class Block
         }
 
         return false;
+    }
+
+    protected virtual Vector3 ComputePointA(int x, int y, int z)
+    {
+        return new Vector3(x - 0.5f, y - 0.5f, z - 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointB(int x, int y, int z)
+    {
+        return new Vector3(x + 0.5f, y - 0.5f, z - 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointC(int x, int y, int z)
+    {
+        return new Vector3(x - 0.5f, y + 0.5f, z - 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointD(int x, int y, int z)
+    {
+        return new Vector3(x + 0.5f, y + 0.5f, z - 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointE(int x, int y, int z)
+    {
+        return new Vector3(x - 0.5f, y - 0.5f, z + 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointF(int x, int y, int z)
+    {
+        return new Vector3(x + 0.5f, y - 0.5f, z + 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointG(int x, int y, int z)
+    {
+        return new Vector3(x - 0.5f, y + 0.5f, z + 0.5f);
+    }
+
+    protected virtual Vector3 ComputePointH(int x, int y, int z)
+    {
+        return new Vector3(x + 0.5f, y + 0.5f, z + 0.5f);
     }
 
     public virtual MeshData Blockdata
@@ -75,12 +129,10 @@ public class Block
 	{
 		meshData.AddQuadTriangles();
 
-		Vector2 color = new Vector2((Random.value / 10) + 0.25f,
-		                            (Random.value / 10) + 0.7f);
-		meshData.AddUVCoord(color);
-		meshData.AddUVCoord(color);
-		meshData.AddUVCoord(color);
-		meshData.AddUVCoord(color);
+		meshData.AddUVCoord(colorUV);
+		meshData.AddUVCoord(colorUV);
+		meshData.AddUVCoord(colorUV);
+		meshData.AddUVCoord(colorUV);
 		
 		return meshData;
 	}
@@ -88,12 +140,11 @@ public class Block
     protected virtual MeshData FaceDataUp
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
+        meshData.AddVertex(ComputePointG(x, y, z));
+        meshData.AddVertex(ComputePointH(x, y, z));
+        meshData.AddVertex(ComputePointD(x, y, z));
+        meshData.AddVertex(ComputePointC(x, y, z));
 
-        //meshData.AddQuadTriangles();
 		SharedFaceData (meshData);
         return meshData;
     }
@@ -101,10 +152,10 @@ public class Block
     protected virtual MeshData FaceDataDown
      (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
+        meshData.AddVertex(ComputePointA(x, y, z));
+        meshData.AddVertex(ComputePointB(x, y, z));
+        meshData.AddVertex(ComputePointF(x, y, z));
+        meshData.AddVertex(ComputePointE(x, y, z));
 
 		SharedFaceData (meshData);
         return meshData;
@@ -113,10 +164,10 @@ public class Block
     protected virtual MeshData FaceDataNorth
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
+        meshData.AddVertex(ComputePointF(x, y, z));
+        meshData.AddVertex(ComputePointH(x, y, z));
+        meshData.AddVertex(ComputePointG(x, y, z));
+        meshData.AddVertex(ComputePointE(x, y, z));
 
 		SharedFaceData (meshData);
         return meshData;
@@ -125,10 +176,10 @@ public class Block
     protected virtual MeshData FaceDataEast
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
+        meshData.AddVertex(ComputePointB(x, y, z));
+        meshData.AddVertex(ComputePointD(x, y, z));
+        meshData.AddVertex(ComputePointH(x, y, z));
+        meshData.AddVertex(ComputePointF(x, y, z));
 
 		SharedFaceData (meshData);
         return meshData;
@@ -137,10 +188,10 @@ public class Block
     protected virtual MeshData FaceDataSouth
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
+        meshData.AddVertex(ComputePointA(x, y, z));
+        meshData.AddVertex(ComputePointC(x, y, z));
+        meshData.AddVertex(ComputePointD(x, y, z));
+        meshData.AddVertex(ComputePointB(x, y, z));
 
 		SharedFaceData (meshData);
         return meshData;
@@ -149,10 +200,10 @@ public class Block
     protected virtual MeshData FaceDataWest
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
-        meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
+        meshData.AddVertex(ComputePointE(x, y, z));
+        meshData.AddVertex(ComputePointG(x, y, z));
+        meshData.AddVertex(ComputePointC(x, y, z));
+        meshData.AddVertex(ComputePointA(x, y, z));
 
 		SharedFaceData (meshData);
         return meshData;

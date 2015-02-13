@@ -52,6 +52,7 @@ public class MeshData
 
     }
 
+    // not currently used
     public void AddTriangle(int tri)
     {
         triangles.Add(tri);

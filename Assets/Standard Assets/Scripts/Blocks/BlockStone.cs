@@ -13,25 +13,13 @@ public class BlockStone : Block
 {
 	public BlockStone () : base ()
 	{
+        colorUV = new Vector2((Random.value / 10) + 0.1f,
+                              (Random.value / 10) + 0.1f);
 	}
 
 	public override string ToString()
 	{
 		return "block stone";
-	}
-
-	public override MeshData SharedFaceData(MeshData meshData)
-	{
-		meshData.AddQuadTriangles();
-		
-		Vector2 color = new Vector2((Random.value / 10) + 0.1f,
-		                            (Random.value / 10) + 0.1f);
-		meshData.AddUVCoord(color);
-		meshData.AddUVCoord(color);
-		meshData.AddUVCoord(color);
-		meshData.AddUVCoord(color);
-		
-		return meshData;
 	}
 }
 
