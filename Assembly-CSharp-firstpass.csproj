@@ -47,17 +47,17 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Standard Assets\Character Controllers\Sources\Scripts\MouseLook.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Blocks\Air.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Blocks\Block.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\Blocks\BlockAir.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\Blocks\BlockStone.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Blocks\Dirt.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Blocks\Stone.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Chunk.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Game.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\MeshData.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\PlayerAnimationState.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\World.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\WorldGen.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\WorldRender.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />

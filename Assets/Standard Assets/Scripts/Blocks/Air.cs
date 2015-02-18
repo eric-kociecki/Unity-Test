@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BlockAir : Block
+public class Air : Block
 {
-    public BlockAir()
+	/// <summary>
+	/// Gets the block type ID. Each block type must have a unique ID.
+	/// </summary>
+	public static int ID = 0;
+
+    public Air()
         : base()
     {
 
@@ -19,6 +24,11 @@ public class BlockAir : Block
     {
         return false;
     }
+
+	public override int GetID()
+	{
+		return Air.ID;
+	}
 
     public override string ToString()
     {

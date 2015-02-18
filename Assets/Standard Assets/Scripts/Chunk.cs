@@ -7,27 +7,22 @@ using System.Collections;
 
 public class Chunk : MonoBehaviour
 {
-    public static int chunkSize = 16;
-    public bool update = true;
-
+    public static int ChunkSize = 16;
+    
     MeshFilter filter;
-    MeshCollider coll;
-	MeshRenderer renderer;
-
-	public Material material;
+    MeshCollider meshCollider;
 
     public World world; // must be set before Start() runs
 
-    public int chunkX; // all 3 of these must be set before Start() runs. Use SetChunkCoordinates()
-    public int chunkY;
-    public int chunkZ;
+    private int chunkX; // all 3 of these must be set before Start() runs. Use SetChunkCoordinates()
+    private int chunkY;
+    private int chunkZ;
 
     // Use this for initialization
     void Start()
     {
         filter = gameObject.GetComponent<MeshFilter>();
-        coll = gameObject.GetComponent<MeshCollider>();
-		renderer = gameObject.GetComponent<MeshRenderer>();
+        meshCollider = gameObject.GetComponent<MeshCollider>();
 
         UpdateChunk();
     }
@@ -52,9 +47,9 @@ public class Chunk : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <returns></returns>
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlockAt(int x, int y, int z)
     {
-        return world.GetBlock(x, y, z);
+        return world.GetBlockAt(x, y, z);
     }
 
     // Updates the chunk based on its contents
@@ -62,17 +57,17 @@ public class Chunk : MonoBehaviour
     {
         MeshData meshData = new MeshData();
 
-        for (int x = 0; x < chunkSize; x++)
+        for (int x = 0; x < ChunkSize; x++)
         {
-            for (int y = 0; y < chunkSize; y++)
+            for (int y = 0; y < ChunkSize; y++)
             {
-                for (int z = 0; z < chunkSize; z++)
+                for (int z = 0; z < ChunkSize; z++)
                 {
-                    meshData = GetBlock(ConvertXToAbsolute(x), ConvertYToAbsolute(y), ConvertZToAbsolute(z)).Blockdata(this,
-                                                                                                                       ConvertXToAbsolute(x),
-                                                                                                                       ConvertYToAbsolute(y),
-                                                                                                                       ConvertZToAbsolute(z),
-                                                                                                                       meshData);
+                    meshData = GetBlockAt(ConvertXToAbsolute(x), ConvertYToAbsolute(y), ConvertZToAbsolute(z)).Blockdata(this,
+                                                                                                                       	 ConvertXToAbsolute(x),
+                                                                                                                       	 ConvertYToAbsolute(y),
+                                                                                                                         ConvertZToAbsolute(z),
+                                                                                                                         meshData);
                 }
             }
         }
@@ -82,17 +77,17 @@ public class Chunk : MonoBehaviour
 
     protected int ConvertXToAbsolute(int localX)
     {
-        return (chunkX * chunkSize) + localX;
+        return (chunkX * ChunkSize) + localX;
     }
 
     protected int ConvertYToAbsolute(int localY)
     {
-        return (chunkY * chunkSize) + localY;
+        return (chunkY * ChunkSize) + localY;
     }
 
     protected int ConvertZToAbsolute(int localZ)
     {
-        return (chunkZ * chunkSize) + localZ;
+        return (chunkZ * ChunkSize) + localZ;
     }
 
     // Sends the calculated mesh information
@@ -105,15 +100,15 @@ public class Chunk : MonoBehaviour
 		filter.mesh.uv = meshData.uv.ToArray();
         filter.mesh.RecalculateNormals();
 
-        coll.sharedMesh = null;
+        meshCollider.sharedMesh = null;
         Mesh mesh = new Mesh();
         mesh.vertices = meshData.colVertices.ToArray();
         mesh.triangles = meshData.colTriangles.ToArray();
         mesh.RecalculateNormals();
 
-        coll.sharedMesh = mesh;
+        meshCollider.sharedMesh = mesh;
 
-		renderer.material = world.blockColors;
+		renderer.material = world.BlockColors;
     }
 
 }

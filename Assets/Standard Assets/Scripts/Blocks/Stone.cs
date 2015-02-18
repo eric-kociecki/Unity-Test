@@ -9,12 +9,22 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 
-public class BlockStone : Block
+public class Stone : Block
 {
-	public BlockStone () : base ()
+	/// <summary>
+	/// Gets the block type ID. Each block type must have a unique ID.
+	/// </summary>
+	public static int ID = 1;
+
+	public Stone () : base ()
 	{
         colorUV = new Vector2((Random.value / 10) + 0.1f,
                               (Random.value / 10) + 0.1f);
+	}
+
+	public override int GetID()
+	{
+		return Stone.ID;
 	}
 
 	public override string ToString()

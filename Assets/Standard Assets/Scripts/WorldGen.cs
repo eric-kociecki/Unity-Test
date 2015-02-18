@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-
+﻿using System.Collections;
+using UnityEngine;
 
 public class WorldGen
 {
@@ -19,7 +18,8 @@ public class WorldGen
 	/// </summary>
 	void CreateWorldArray()
 	{
-		world.WorldArray = new int[world.WorldSizeX, world.WorldSizeY, world.WorldSizeZ];
+		world.Blocks = new Block[world.WorldSizeX, world.WorldSizeY, world.WorldSizeZ];
+
 	}
 
 	/// <summary>
@@ -28,40 +28,63 @@ public class WorldGen
 	void PopulateWorld()
 	{
 		int roll;
+		int newBlockType;
 
 		for (int x = 0; x < world.WorldSizeX; x++)
 		{
 			for (int z = 0; z < world.WorldSizeZ; z++)
 			{
-				world.WorldArray[x,0,z] = 1;
-                //world.WorldArray[x, 1, z] = 1;
+				world.Blocks[x,0,z] = CreateBlock (Stone.ID);
 				for (int y = 1; y < world.WorldSizeY; y++)
 				{
-					if (world.WorldArray[x,y-1,z] > 0)
+					newBlockType = 0;
+
+					if (world.Blocks[x,y-1,z].GetID() > 0)
 					{
 						roll = rnd.Next(0, 100);
 
 						if (roll < 30)
 						{
-							world.WorldArray[x,y,z] = world.WorldArray[x,y-1,z];
+							newBlockType = world.Blocks[x,y-1,z].GetID();
 						}
 						else if (roll < 45)
 						{
-							if (world.WorldArray[x,y-1,z] == 1)
+							if (world.Blocks[x,y-1,z].GetID() == Stone.ID)
 							{
-								world.WorldArray[x,y,z] = 2;
+								newBlockType = Dirt.ID;
 							}
 						}
 					}
+
+					world.Blocks[x, y, z] = CreateBlock (newBlockType);
 				}
 			}
 		}
-        /*world.WorldArray[17, 1, 3] = 1;
-        world.WorldArray[17, 1, 4] = 1;
-        world.WorldArray[17, 1, 2] = 1;
-        world.WorldArray[18, 1, 3] = 1;
-        world.WorldArray[16, 1, 3] = 1;
-        world.WorldArray[17, 2, 3] = 1;*/
+	}
+
+	/// <summary>
+	/// Creates a block based on the given block type ID.
+	/// </summary>
+	/// <returns>The newly created block.</returns>
+	/// <param name="type">Block type ID of desired block.</param>
+	public Block CreateBlock(int type)
+	{
+		Block newBlock;
+
+		switch (type)
+		{
+		case 1:
+			newBlock = new Stone();
+			break;
+		case 2:
+			newBlock = new Dirt();
+			break;
+		default:
+			newBlock =  new Air();
+			break;
+		}
+
+		return newBlock;
 	}
 
 	// Update is called once per frame

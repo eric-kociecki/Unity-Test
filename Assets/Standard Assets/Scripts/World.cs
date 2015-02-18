@@ -1,36 +1,40 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 
-public class World : MonoBehaviour
+/// <summary>
+/// Stores the world data (in RAM for now) and has a WorldGen object for creating the world. Uses Chunk objects to combine blocks into meshes and add them into the game space.
+/// </summary>
+public class World
 {
 	public readonly int WorldSizeX = 64; // Edit these to adjust world size, setting them to something other than
 	public readonly int WorldSizeY = 32; // a multiple of Chunk.chunkSize is untested.
 	public readonly int WorldSizeZ = 64;
 
-	public int[,,] WorldArray; // used by current WorldGen, but should be replaced by usage of blocks array
-    Block[, ,] blocks; // used by chunk / mesh system
+	public Block[, ,] Blocks; // 3D array of all blocks
     Chunk[, ,] chunks; // array of chunks
 
     WorldGen worldGen; // this class generates the world
 
-	public Material blockColors;
+	/// <summary>
+	/// Stores the material and associated texture for coloring blocks.
+	/// </summary>
+	public Material BlockColors;
 
 	// Use this for initialization
-	void Start ()
+	public World()
     {
-		blockColors = Resources.Load<Material>("hsv");
+		BlockColors = Resources.Load<Material>("hsv");
 
         worldGen = new WorldGen(this);
 
-        ConvertBlockTypesToBlockData();
         GenerateChunks();
 	}
 
     void GenerateChunks()
     {
-        int numChunksX = WorldSizeX / Chunk.chunkSize;
-        int numChunksY = WorldSizeY / Chunk.chunkSize;
-        int numChunksZ = WorldSizeZ / Chunk.chunkSize;
+        int numChunksX = WorldSizeX / Chunk.ChunkSize;
+        int numChunksY = WorldSizeY / Chunk.ChunkSize;
+        int numChunksZ = WorldSizeZ / Chunk.ChunkSize;
         
         chunks = new Chunk[numChunksX,
                            numChunksY,
@@ -51,47 +55,16 @@ public class World : MonoBehaviour
         }
     }
 
-    // this won't be needed once the world gen us updated for the new Block class
-    void ConvertBlockTypesToBlockData()
-    {
-        blocks = new Block[WorldSizeX, WorldSizeY, WorldSizeZ];
-
-        for (int x = 0; x < WorldSizeX; x++)
-        {
-            for (int y = 0; y < WorldSizeY; y++)
-            {
-                for (int z = 0; z < WorldSizeZ; z++)
-                {
-                    if (WorldArray[x, y, z] > 0)
-                    {
-						if (y == 1) 
-						{
-							blocks[x, y, z] = new BlockStone();
-						}
-						else
-						{
-                        	blocks[x, y, z] = new Dirt();
-						}
-                    }
-                    else
-                    {
-                        blocks[x, y, z] = new BlockAir();
-                    }
-                }
-            }
-        }
-    }
-
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlockAt(int x, int y, int z)
     {
         if ((x < 0) || (x > WorldSizeX - 1) ||
             (y < 0) || (y > WorldSizeY - 1) ||
             (z < 0) || (z > WorldSizeZ - 1))
         {
-            return new BlockAir();
+            return new Air();
         }
 
-        return blocks[x, y, z];
+        return Blocks[x, y, z];
     }
 
 	// Update is called once per frame
