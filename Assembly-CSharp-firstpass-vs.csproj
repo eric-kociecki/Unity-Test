@@ -56,8 +56,10 @@
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\MeshData.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\PlayerAnimationState.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\World.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\WorldGen.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\World\ChunkStore.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\World\Index.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\World\World.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\World\WorldGen.cs" />
      <None Include="Assets\Standard Assets\Projectors\Guidelines.txt" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Multiply.shader" />
      <None Include="Assets\Standard Assets\Projectors\Sources\Shaders\Projector Light.shader" />

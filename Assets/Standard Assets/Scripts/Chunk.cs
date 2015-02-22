@@ -7,16 +7,17 @@ using System.Collections;
 
 public class Chunk : MonoBehaviour
 {
-    public static int ChunkSize = 16;
+    public static int ChunkSize = 8;
     
     MeshFilter filter;
     MeshCollider meshCollider;
 
-    public World world; // must be set before Start() runs
+	public World ParentWorld { get; set; } // must be set before Start() runs
 
-    private int chunkX; // all 3 of these must be set before Start() runs. Use SetChunkCoordinates()
-    private int chunkY;
-    private int chunkZ;
+	public Block[,,] blocks = new Block[ChunkSize, ChunkSize, ChunkSize];
+
+	// must be set before adding blocks
+	public Index Location { get; set; }
 
     // Use this for initialization
     void Start()
@@ -25,13 +26,6 @@ public class Chunk : MonoBehaviour
         meshCollider = gameObject.GetComponent<MeshCollider>();
 
         UpdateChunk();
-    }
-
-    public void SetChunkCoordinates(int x, int y, int z)
-    {
-        chunkX = x;
-        chunkY = y;
-        chunkZ = z;
     }
 
     //Update is called once per frame
@@ -49,8 +43,13 @@ public class Chunk : MonoBehaviour
     /// <returns></returns>
     public Block GetBlockAt(int x, int y, int z)
     {
-        return world.GetBlockAt(x, y, z);
+        return ParentWorld.GetBlockAt(x, y, z);
     }
+
+	public Block GetLocalBlockAt(Index position)
+	{
+		return blocks[position.X, position.Y, position.Z];
+	}
 
     // Updates the chunk based on its contents
     public void UpdateChunk()
@@ -63,11 +62,11 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < ChunkSize; z++)
                 {
-                    meshData = GetBlockAt(ConvertXToAbsolute(x), ConvertYToAbsolute(y), ConvertZToAbsolute(z)).Blockdata(this,
-                                                                                                                       	 ConvertXToAbsolute(x),
-                                                                                                                       	 ConvertYToAbsolute(y),
-                                                                                                                         ConvertZToAbsolute(z),
-                                                                                                                         meshData);
+					meshData = GetLocalBlockAt(new Index(x, y, z)).Blockdata(this,
+					                                                         ConvertXToAbsolute(x),
+					                                                         ConvertYToAbsolute(y),
+					                                                         ConvertZToAbsolute(z),
+					                                                         meshData);
                 }
             }
         }
@@ -77,17 +76,17 @@ public class Chunk : MonoBehaviour
 
     protected int ConvertXToAbsolute(int localX)
     {
-        return (chunkX * ChunkSize) + localX;
+        return (Location.X * ChunkSize) + localX;
     }
 
     protected int ConvertYToAbsolute(int localY)
     {
-        return (chunkY * ChunkSize) + localY;
+        return (Location.Y * ChunkSize) + localY;
     }
 
     protected int ConvertZToAbsolute(int localZ)
     {
-        return (chunkZ * ChunkSize) + localZ;
+        return (Location.Z * ChunkSize) + localZ;
     }
 
     // Sends the calculated mesh information
@@ -108,7 +107,6 @@ public class Chunk : MonoBehaviour
 
         meshCollider.sharedMesh = mesh;
 
-		renderer.material = world.BlockColors;
+		renderer.material = ParentWorld.BlockColors;
     }
-
 }
