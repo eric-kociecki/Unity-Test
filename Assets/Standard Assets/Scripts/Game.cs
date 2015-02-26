@@ -9,34 +9,31 @@ public class Game : MonoBehaviour {
 	World world;
 	GameObject player;
 
-	int frameCycle = 0;
-
 	// Use this for initialization
-	void Start ()
+	IEnumerator Start ()
 	{
 		world = new World();
 		player = GameObject.Find("Player");
+		player.SetActive(false);
+		yield return StartCoroutine(world.UpdateChunksAround(player.transform.position, this));
+		player.SetActive(true);
 	}
 	
 	// Update is called once per frame
 	void Update ()
 	{
-		frameCycle++;
-
-		// this switch is for tasks that don't need to run every frame
-		switch (frameCycle)
+		if (!world.IsGenerating)
 		{
-		case 1:
-			world.GenerateNewChunksAround(player.transform.position);
-			break;
-		case 15:
-			world.CullChunks(player.transform.position);
-			break;
-		case 30:
-			frameCycle = 0;
-			break;
+			StartCoroutine(world.UpdateChunksAround(player.transform.position, this));
 		}
 	}
+
+	/*IEnumerator Initializer()
+	{
+		StartCoroutine(world.UpdateChunksAround(player.transform.position));
+		yield return null;
+		player.SetActive(true);
+	}*/
 
 
 }

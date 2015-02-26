@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,7 @@ using UnityEngine;
 public class World
 {
 	int renderDistance = 1; // this is measured in chunks
+	int generateDistance = 2;
 
 	ChunkStore chunks;
 
@@ -19,6 +21,8 @@ public class World
 	/// </summary>
 	public Material BlockColors;
 
+	public bool IsGenerating { get; set; }
+
 	// Use this for initialization
 	public World()
     {
@@ -27,6 +31,8 @@ public class World
 		chunks = new ChunkStore();
 
         worldGen = new WorldGen(this);
+
+		IsGenerating = false;
 	}
 
     public Block GetBlockAt(int x, int y, int z)
@@ -44,11 +50,34 @@ public class World
 		}
     }
 
+	// this function takes separate chunk and local coords, converts them into absolute coords, and sends them to GetBlockAt which breaks them into
+	// separate chunk and local coords again. This seems like wasted effort (and it mostly is), but it handles cases where the local coords are
+	// actually outside of the local coord system. E.G. localY = -1. In this case, the conversion from local to absolute and back to local will
+	// correct this issue by looking at localY = 15 in the chunk below the originally requesed one
 	public Block GetBlockAt(int chunkX, int chunkY, int chunkZ, int localX, int localY, int localZ)
 	{
 		return GetBlockAt((chunkX * Chunk.ChunkSize) + localX,
 		                  (chunkY * Chunk.ChunkSize) + localY,
 		                  (chunkZ * Chunk.ChunkSize) + localZ);
+	}
+
+	public Block GetBlockAt2(int chunkX, int chunkY, int chunkZ, int localX, int localY, int localZ)
+	{
+		Index chunkPosition = new Index(chunkX, chunkY, chunkZ);
+
+		if (chunks[chunkPosition] == null)
+		{
+			return new Air();
+		}
+		else
+		{
+			if (chunkY == 1)
+			{
+				UnityEngine.Debug.Log("wait");
+			}
+
+			return chunks[chunkPosition].GetLocalBlockAt(new Index(localX, localY, localZ));
+		}
 	}
 
 	public Index ConvertPositionToChunkCoordinates(Vector3 position)
@@ -86,25 +115,106 @@ public class World
 		return newChunk;
 	}
 
-    public void GenerateNewChunksAround(Vector3 position)
+	protected void Benchmark(Action function, string description)
+	{
+		Stopwatch watch = new Stopwatch();
+		watch.Start();
+		function();
+		watch.Stop();
+		UnityEngine.Debug.Log (String.Format (String.Format ("{0} Time:{1:fffffff}", description, watch.Elapsed)));
+	}
+
+	public IEnumerator UpdateChunksAround(Vector3 position, MonoBehaviour coroutineParent)
+	{
+		IsGenerating = true;
+
+		Index currentChunkPosition = ConvertPositionToChunkCoordinates(position);
+
+		yield return coroutineParent.StartCoroutine(GenerateNewChunksAround(currentChunkPosition));
+
+		yield return coroutineParent.StartCoroutine (SetRenderStatus (currentChunkPosition));
+
+		yield return coroutineParent.StartCoroutine(CullChunks(position));
+
+		IsGenerating = false;
+	}
+
+	public IEnumerator InitialChunkGeneration(Vector3 position, MonoBehaviour coroutineParent)
+	{
+		IsGenerating = true;
+		
+		Index currentChunkPosition = ConvertPositionToChunkCoordinates(position);
+
+		yield return coroutineParent.StartCoroutine(GenerateNewChunksAround(currentChunkPosition));
+
+		IsGenerating = false;
+	}
+
+	protected IEnumerator GenerateNewChunksAround(Index currentChunkPosition)
     {
-        Index currentChunk = ConvertPositionToChunkCoordinates(position);
-		for (int x = (currentChunk.X - renderDistance); x <= (currentChunk.X + renderDistance); x++)
+		for (int x = (currentChunkPosition.X - generateDistance); x <= (currentChunkPosition.X + generateDistance); x++)
 		{
-			for (int y = (currentChunk.Y - renderDistance); y <= (currentChunk.Y + renderDistance); y++)
+			for (int y = (currentChunkPosition.Y - generateDistance); y <= (currentChunkPosition.Y + generateDistance); y++)
 			{
-				for (int z = (currentChunk.Z - renderDistance); z <= (currentChunk.Z + renderDistance); z++)
+				for (int z = (currentChunkPosition.Z - generateDistance); z <= (currentChunkPosition.Z + generateDistance); z++)
 				{
 					if (chunks[x, y, z] == null)
 					{
 						CreateChunk(new Index(x, y, z));
+						yield return null;
 					}
 				}	
 			}
 		}
 	}
 
-	public void CullChunks(Vector3 position)
+	protected IEnumerator SetRenderStatus(Index currentChunkPosition)
+	{
+		// set chunks within renderDistance to render
+		for (int x = (currentChunkPosition.X - renderDistance); x <= (currentChunkPosition.X + renderDistance); x++)
+		{
+			for (int y = (currentChunkPosition.Y - renderDistance); y <= (currentChunkPosition.Y + renderDistance); y++)
+			{
+				for (int z = (currentChunkPosition.Z - renderDistance); z <= (currentChunkPosition.Z + renderDistance); z++)
+				{
+					chunks[x, y, z].ShouldRender = true;
+				}	
+			}
+		}
+
+		yield return null;
+
+		if (generateDistance > renderDistance)
+		{
+			// set chunks within generateDistance but outside of renderDistance to not render
+			for (int x = (currentChunkPosition.X - generateDistance); x < (currentChunkPosition.X - renderDistance); x++)
+			{
+				for (int y = (currentChunkPosition.Y - generateDistance); y < (currentChunkPosition.Y - renderDistance); y++)
+				{
+					for (int z = (currentChunkPosition.Z - generateDistance); z < (currentChunkPosition.Z - renderDistance); z++)
+					{
+						chunks[x, y, z].ShouldRender = false;
+					}	
+				}
+			}
+
+			yield return null;
+
+			for (int x = (currentChunkPosition.X + renderDistance + 1); x <= (currentChunkPosition.X + generateDistance); x++)
+			{
+				for (int y = (currentChunkPosition.Y + renderDistance + 1); y <= (currentChunkPosition.Y + generateDistance); y++)
+				{
+					for (int z = (currentChunkPosition.Z + renderDistance + 1); z <= (currentChunkPosition.Z + generateDistance); z++)
+					{
+						chunks[x, y, z].ShouldRender = false;
+					}	
+				}
+			}
+		}
+
+	}
+
+	public IEnumerator CullChunks(Vector3 position)
 	{
 		Index currentChunk = ConvertPositionToChunkCoordinates(position);
 
@@ -114,11 +224,12 @@ public class World
 		{
 			if (c != null)
 			{
-				if ((Math.Abs (c.Location.X - currentChunk.X) > renderDistance) ||
-				    (Math.Abs (c.Location.Y - currentChunk.Y) > renderDistance) ||
-				    (Math.Abs (c.Location.Z - currentChunk.Z) > renderDistance))
+				if ((Math.Abs (c.Location.X - currentChunk.X) > generateDistance) ||
+				    (Math.Abs (c.Location.Y - currentChunk.Y) > generateDistance) ||
+				    (Math.Abs (c.Location.Z - currentChunk.Z) > generateDistance))
 				{
 					chunks.Remove(c);
+					yield return null;
 				}
 			}
 		}

@@ -35,7 +35,7 @@ public class ChunkStore
 
 	public ChunkStore()
 	{
-		resizeArray (new Index(10, 10, 10));
+		resizeArray (new Index(11, 11, 11));
 		mapper = new Dictionary<Index, Index>();
 	}
 

@@ -21,6 +21,8 @@ public class WorldGen
 		int newBlockID;
 		int roll;
 
+		//currentChunk.blocks = new Block[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
+
 		for (int localX = 0; localX < Chunk.ChunkSize; localX++)
 		{
 			for (int localY = 0; localY < Chunk.ChunkSize; localY++)
@@ -28,15 +30,16 @@ public class WorldGen
 				for (int localZ = 0; localZ < Chunk.ChunkSize; localZ++)
 				{
 					if ((chunkY < 0) ||
-					    ((chunkY == 0) && localY == 0))
+					    ((chunkY == 0) && (localY == 0)))
 					{
 						newBlockID = Stone.ID;
 					}
 					else
 					{
-						newBlockID = 0;
+						newBlockID = Air.ID;
+
 						underBlockID = world.GetBlockAt(chunkX, chunkY, chunkZ, localX, localY - 1, localZ).GetID();
-						
+
 						/*if (underBlockID > 0)
 						{
 							roll = rnd.Next(0, 100);

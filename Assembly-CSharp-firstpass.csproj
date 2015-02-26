@@ -52,6 +52,7 @@
      <Compile Include="Assets\Standard Assets\Scripts\Blocks\Dirt.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Blocks\Stone.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Chunk.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\EnemyAI.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\Game.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\MeshData.cs" />
