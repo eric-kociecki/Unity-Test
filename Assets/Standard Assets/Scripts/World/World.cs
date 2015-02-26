@@ -10,9 +10,10 @@ using UnityEngine;
 public class World
 {
 	int renderDistance = 1; // this is measured in chunks
-	int generateDistance = 2;
+	int generateDistance = 1;
 
-	ChunkStore chunks;
+	//ChunkStore chunks;
+	Sparse3DArray<Chunk> chunks;
 
     WorldGen worldGen; // this class generates the world
 
@@ -28,7 +29,7 @@ public class World
     {
 		BlockColors = Resources.Load<Material>("hsv");
 
-		chunks = new ChunkStore();
+		chunks = new Sparse3DArray<Chunk>();
 
         worldGen = new WorldGen(this);
 
@@ -107,7 +108,7 @@ public class World
         newChunk.ParentWorld = this;
 
 		// this must be added to the ChunkStore before generating blocks in the chunk
-		chunks.Add(newChunk);
+		chunks.Add(chunkPosition, newChunk);
 
 		// generate the blocks in the chunk
 		worldGen.GenerateChunk(newChunk);
@@ -218,7 +219,7 @@ public class World
 	{
 		Index currentChunk = ConvertPositionToChunkCoordinates(position);
 
-		Chunk[,,] allChunks = chunks.GetAllChunks();
+		Chunk[] allChunks = chunks.ToArray();
 
 		foreach (Chunk c in allChunks)
 		{
@@ -229,6 +230,7 @@ public class World
 				    (Math.Abs (c.Location.Z - currentChunk.Z) > generateDistance))
 				{
 					chunks.Remove(c);
+					UnityEngine.Object.Destroy(c.gameObject);
 					yield return null;
 				}
 			}

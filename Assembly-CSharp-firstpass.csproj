@@ -57,7 +57,7 @@
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\MeshData.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\PlayerAnimationState.cs" />
-     <Compile Include="Assets\Standard Assets\Scripts\World\ChunkStore.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Sparse3DArray.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\World\Index.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\World\World.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\World\WorldGen.cs" />
