@@ -12,7 +12,6 @@ public class World
 	int renderDistance = 1; // this is measured in chunks
 	int generateDistance = 1;
 
-	//ChunkStore chunks;
 	Sparse3DArray<Chunk> chunks;
 
     WorldGen worldGen; // this class generates the world
@@ -29,7 +28,10 @@ public class World
     {
 		BlockColors = Resources.Load<Material>("hsv");
 
+
 		chunks = new Sparse3DArray<Chunk>();
+		int chunkArrayLength = (generateDistance * 2) + 1;
+		chunks.ResizeArray(chunkArrayLength * chunkArrayLength * chunkArrayLength);
 
         worldGen = new WorldGen(this);
 
@@ -111,7 +113,7 @@ public class World
 		chunks.Add(chunkPosition, newChunk);
 
 		// generate the blocks in the chunk
-		worldGen.GenerateChunk(newChunk);
+		Benchmark(() => worldGen.GenerateChunk(newChunk), "chunk gen");
 
 		return newChunk;
 	}

@@ -15,7 +15,7 @@ public class Chunk : MonoBehaviour
 
 	public World ParentWorld { get; set; } // must be set before Start() runs
 
-	public Block[,,] blocks;// = new Block[ChunkSize, ChunkSize, ChunkSize];
+	public Sparse3DArray<Block> blocks;
 
 	// must be set before adding blocks
 	public Index Location { get; set; }
@@ -39,7 +39,8 @@ public class Chunk : MonoBehaviour
 		ShouldRender = false;
 		isModified = true;
 
-		blocks = new Block[ChunkSize, ChunkSize, ChunkSize];
+		blocks = new Sparse3DArray<Block>();
+		blocks.ResizeArray(ChunkSize * ChunkSize * ChunkSize);
 	}
 
     // Use this for initialization
@@ -47,8 +48,6 @@ public class Chunk : MonoBehaviour
     {
         filter = gameObject.GetComponent<MeshFilter>();
         meshCollider = gameObject.GetComponent<MeshCollider>();
-
-        //UpdateChunk();
     }
 
     //Update is called once per frame
@@ -56,7 +55,6 @@ public class Chunk : MonoBehaviour
     {
 		if (ShouldRender && isModified)
 		{
-			//StartCoroutine(UpdateChunk());
 			UpdateChunk();
 			isModified = false;
 		}
@@ -76,7 +74,7 @@ public class Chunk : MonoBehaviour
 
 	public Block GetLocalBlockAt(Index position)
 	{
-		Block requested = blocks[position.X, position.Y, position.Z];
+		Block requested = blocks[position];
 
 		if (requested == null)
 		{
@@ -90,6 +88,11 @@ public class Chunk : MonoBehaviour
 		}
 
 		return requested;
+	}
+
+	public void SetDefaultBlock(Block newDefault)
+	{
+		blocks.SetDefault(newDefault);
 	}
 
     // Updates the chunk based on its contents
@@ -108,7 +111,6 @@ public class Chunk : MonoBehaviour
 					                                                         ConvertYToAbsolute(y),
 					                                                         ConvertZToAbsolute(z),
 					                                                         meshData);
-					//yield return null;
                 }
             }
         }

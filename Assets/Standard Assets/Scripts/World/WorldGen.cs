@@ -29,8 +29,12 @@ public class WorldGen
 			{
 				for (int localZ = 0; localZ < Chunk.ChunkSize; localZ++)
 				{
-					if ((chunkY < 0) ||
-					    ((chunkY == 0) && (localY == 0)))
+					if (chunkY < 0)
+					{
+						currentChunk.SetDefaultBlock(CreateBlock(Stone.ID));
+						return;
+					}
+					else if ((chunkY == 0) && (localY == 0))
 					{
 						newBlockID = Stone.ID;
 					}

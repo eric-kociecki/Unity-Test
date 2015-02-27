@@ -18,6 +18,8 @@ public class Sparse3DArray<T>
 	protected T[] contents;
 	protected Dictionary<Index, int> mapper;
 
+	protected T filler;
+
 	public int Size	{ get; protected set; }
 	
 	public T this[Index logical]
@@ -48,11 +50,17 @@ public class Sparse3DArray<T>
 	{
 		contents = new T[bufferSize];
 		mapper = new Dictionary<Index, int>();
+		filler = default(T);
 	}
 	
 	protected bool GetPhysicalAddress(Index logical, out int physical)
 	{
-		return mapper.TryGetValue (new Index(logical.X, logical.Y, logical.Z), out physical);
+		return mapper.TryGetValue (logical, out physical);
+	}
+
+	public void SetDefault(T newDefault)
+	{
+		filler = newDefault;
 	}
 	
 	public T GetItem(Index logical)
@@ -65,7 +73,7 @@ public class Sparse3DArray<T>
 		}
 		else
 		{
-			return default(T);
+			return filler;
 		}
 	}
 	
@@ -105,6 +113,7 @@ public class Sparse3DArray<T>
 				if (contents[x].Equals(item))
 				{
 					contents[x] = default(T);
+					// TODO should the mapper entry be removed as well? probably.
 					Size--;
 					return true;
 				}
@@ -143,7 +152,7 @@ public class Sparse3DArray<T>
 	{
 		for (int x = 0; x < physicalSize; x++)
 		{
-			if (contents == null)
+			if (contents[x] == null)
 			{
 				return x;
 			}
@@ -173,6 +182,7 @@ public class Sparse3DArray<T>
 	/// <param name="newSize">New size.</param>
 	public void ResizeArray(int newSize)
 	{
+		//Debug.Log (String.Format("New Sparse3DArray size of {0}. Old size was {1}.", newSize, physicalSize));
 		if (newSize > physicalSize)
 		{
 			// store old array
