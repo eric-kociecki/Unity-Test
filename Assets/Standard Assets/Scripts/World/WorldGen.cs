@@ -21,6 +21,10 @@ public class WorldGen
 		int newBlockID;
 		int roll;
 
+		Index absolutePosition;
+
+		float noise;
+
 		//currentChunk.blocks = new Block[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
 
 		for (int localX = 0; localX < Chunk.ChunkSize; localX++)
@@ -42,7 +46,14 @@ public class WorldGen
 					{
 						newBlockID = Air.ID;
 
-						underBlockID = world.GetBlockAt(chunkX, chunkY, chunkZ, localX, localY - 1, localZ).GetID();
+						//underBlockID = world.GetBlockAt(chunkX, chunkY, chunkZ, localX, localY - 1, localZ).GetID();
+						absolutePosition = world.ConvertPositionToAbsoluteCoordinates(new Index(localX, localY, localZ), currentChunk.Location);
+
+						noise = Mathf.PerlinNoise(absolutePosition.X / 100f, absolutePosition.Z / 100f) * Chunk.ChunkSize;
+						if ((chunkY == 0) && (localY <= noise))
+						{
+							newBlockID = Stone.ID;
+						}
 
 						/*if (underBlockID > 0)
 						{

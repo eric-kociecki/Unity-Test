@@ -9,8 +9,8 @@ using UnityEngine;
 /// </summary>
 public class World
 {
-	int renderDistance = 1; // this is measured in chunks
-	int generateDistance = 1;
+	int renderDistance = 2; // this is measured in chunks
+	int generateDistance = 2;
 
 	Sparse3DArray<Chunk> chunks;
 
@@ -97,6 +97,13 @@ public class World
 		return new Index((int)position.x - (chunkCoords.X * Chunk.ChunkSize),
 		                 (int)position.y - (chunkCoords.Y * Chunk.ChunkSize),
 		                 (int)position.z - (chunkCoords.Z * Chunk.ChunkSize));
+	}
+
+	public Index ConvertPositionToAbsoluteCoordinates(Index localPosition, Index chunkPosition)
+	{
+		return new Index((chunkPosition.X * Chunk.ChunkSize) + localPosition.X,
+		                 (chunkPosition.Y * Chunk.ChunkSize) + localPosition.Y,
+		                 (chunkPosition.Z * Chunk.ChunkSize) + localPosition.Z);
 	}
 
 	protected Chunk CreateChunk(Index chunkPosition)
