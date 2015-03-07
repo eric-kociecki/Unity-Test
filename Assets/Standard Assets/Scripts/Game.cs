@@ -27,13 +27,4 @@ public class Game : MonoBehaviour {
 			StartCoroutine(world.UpdateChunksAround(player.transform.position, this));
 		}
 	}
-
-	/*IEnumerator Initializer()
-	{
-		StartCoroutine(world.UpdateChunksAround(player.transform.position));
-		yield return null;
-		player.SetActive(true);
-	}*/
-
-
 }

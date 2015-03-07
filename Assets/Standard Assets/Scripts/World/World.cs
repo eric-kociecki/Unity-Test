@@ -110,7 +110,7 @@ public class World
 	{
 		// create the game object and add the Chunk script
 		GameObject go = new GameObject(String.Format ("Chunk{0},{1},{2}", chunkPosition.X, chunkPosition.Y, chunkPosition.Z));
-		Chunk newChunk = go.AddComponent<Chunk>();
+		Chunk newChunk = new Chunk(go);
 
 		// pass some needed info to the chunk
 		newChunk.Location = chunkPosition;
@@ -133,23 +133,28 @@ public class World
 
 		yield return coroutineParent.StartCoroutine(GenerateNewChunksAround(currentChunkPosition));
 
-		yield return coroutineParent.StartCoroutine (SetRenderStatus (currentChunkPosition));
+		yield return coroutineParent.StartCoroutine(SetRenderStatus(currentChunkPosition));
 
 		yield return coroutineParent.StartCoroutine(CullChunks(position));
+
+		yield return coroutineParent.StartCoroutine(UpdateChunkMeshes());
 
 		IsGenerating = false;
 	}
 
-	/*public IEnumerator InitialChunkGeneration(Vector3 position, MonoBehaviour coroutineParent)
+	public IEnumerator UpdateChunkMeshes()
 	{
-		IsGenerating = true;
+		Chunk[] allChunks = chunks.ToArray();
 		
-		Index currentChunkPosition = ConvertPositionToChunkCoordinates(position);
-
-		yield return coroutineParent.StartCoroutine(GenerateNewChunksAround(currentChunkPosition));
-
-		IsGenerating = false;
-	}*/
+		foreach (Chunk c in allChunks)
+		{
+			if (c != null)
+			{
+				c.UpdateChunk();
+				yield return null;
+			}
+		}
+	}
 
 	protected IEnumerator GenerateNewChunksAround(Index currentChunkPosition)
     {
@@ -179,7 +184,6 @@ public class World
 				for (int z = (currentChunkPosition.Z - renderDistance); z <= (currentChunkPosition.Z + renderDistance); z++)
 				{
 					chunks[x, y, z].ShouldRender = true;
-					yield return null;
 				}	
 			}
 		}
@@ -231,7 +235,7 @@ public class World
 				    (Math.Abs (c.Location.Z - currentChunk.Z) > generateDistance))
 				{
 					chunks.Remove(c);
-					UnityEngine.Object.Destroy(c.gameObject);
+					c.Unload();
 					yield return null;
 				}
 			}

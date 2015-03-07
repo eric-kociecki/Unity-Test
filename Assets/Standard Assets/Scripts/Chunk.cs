@@ -1,12 +1,7 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshCollider))]
-
-public class Chunk : MonoBehaviour
+public class Chunk
 {
 	#region Public Static Variables
 
@@ -86,16 +81,24 @@ public class Chunk : MonoBehaviour
 	#region Private/Protected Fields
 
 	private Block[,,] blocks;
-    MeshFilter filter;
+    MeshFilter meshFilter;
     MeshCollider meshCollider;
+	MeshRenderer meshRenderer;
 
 	protected bool isModified;
+
+	protected GameObject gameObject;
 
 	#endregion
 	#region Constructors
 
-	public Chunk()
+	public Chunk(GameObject inGameObject)
 	{
+		gameObject = inGameObject;
+		meshFilter = gameObject.AddComponent<MeshFilter>();
+		meshCollider = gameObject.AddComponent<MeshCollider>();
+		meshRenderer = gameObject.AddComponent<MeshRenderer>();
+
 		IsGenerated = false;
 		IsOriginal = true;
 		ShouldRender = false;
@@ -118,49 +121,43 @@ public class Chunk : MonoBehaviour
 	{
 		return ParentWorld.GetBlockAt(x, y, z);
 	}
+
+	// consider replacing this with a proper destructor
+	public void Unload()
+	{
+		UnityEngine.Object.Destroy(gameObject);
+	}
 	
 	// Updates the chunk based on its contents
 	public void UpdateChunk()
 	{
-		MeshData meshData = new MeshData();
-		
-		for (int x = 0; x < ChunkSize; x++)
+		if (ShouldRender && isModified)
 		{
-			for (int y = 0; y < ChunkSize; y++)
+			MeshData meshData = new MeshData();
+			
+			for (int x = 0; x < ChunkSize; x++)
 			{
-				for (int z = 0; z < ChunkSize; z++)
+				for (int y = 0; y < ChunkSize; y++)
 				{
-					meshData = this[new Index(x, y, z)].Blockdata(this,
-					                                              ConvertXToAbsolute(x),
-					                                              ConvertYToAbsolute(y),
-					                                              ConvertZToAbsolute(z),
-					                                              meshData);
+					for (int z = 0; z < ChunkSize; z++)
+					{
+						meshData = this[new Index(x, y, z)].Blockdata(this,
+						                                              ConvertXToAbsolute(x),
+						                                              ConvertYToAbsolute(y),
+						                                              ConvertZToAbsolute(z),
+						                                              meshData);
+					}
 				}
 			}
+			
+			RenderMesh(meshData);
+
+			isModified = false;
 		}
-		
-		RenderMesh(meshData);
 	}
 
 	#endregion
 	#region Private/Protected Methods
-
-    // Use this for initialization
-    void Start()
-    {
-        filter = gameObject.GetComponent<MeshFilter>();
-        meshCollider = gameObject.GetComponent<MeshCollider>();
-    }
-
-    //Update is called once per frame
-    void Update()
-    {
-		if (ShouldRender && isModified)
-		{
-			Benchmark.Measure(() => UpdateChunk(), "Update Chunk");
-			isModified = false;
-		}
-    }
 
 	protected bool IsValidLocalCoordinates(int localX, int localY, int localZ)
 	{
@@ -188,11 +185,11 @@ public class Chunk : MonoBehaviour
     // to the mesh and collision components
     void RenderMesh(MeshData meshData)
     {
-        filter.mesh.Clear();
-        filter.mesh.vertices = meshData.vertices.ToArray();
-        filter.mesh.triangles = meshData.triangles.ToArray();
-		filter.mesh.uv = meshData.uv.ToArray();
-        filter.mesh.RecalculateNormals();
+        meshFilter.mesh.Clear();
+		meshFilter.mesh.vertices = meshData.vertices.ToArray();
+		meshFilter.mesh.triangles = meshData.triangles.ToArray();
+		meshFilter.mesh.uv = meshData.uv.ToArray();
+		meshFilter.mesh.RecalculateNormals();
 
         meshCollider.sharedMesh = null;
         Mesh mesh = new Mesh();
@@ -202,7 +199,7 @@ public class Chunk : MonoBehaviour
 
         meshCollider.sharedMesh = mesh;
 
-		GetComponent<Renderer>().material = ParentWorld.BlockColors;
+		meshRenderer.material = ParentWorld.BlockColors;
     }
 
 	#endregion
