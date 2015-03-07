@@ -49,7 +49,7 @@ public class World
 		}
 		else
 		{
-			return chunks[chunkPosition].GetLocalBlockAt(localPosition);
+			return chunks[chunkPosition][localPosition];
 		}
     }
 
@@ -79,7 +79,7 @@ public class World
 				UnityEngine.Debug.Log("wait");
 			}
 
-			return chunks[chunkPosition].GetLocalBlockAt(new Index(localX, localY, localZ));
+			return chunks[chunkPosition][localX, localY, localZ];
 		}
 	}
 
@@ -120,18 +120,9 @@ public class World
 		chunks.Add(chunkPosition, newChunk);
 
 		// generate the blocks in the chunk
-		Benchmark(() => worldGen.GenerateChunk(newChunk), "chunk gen");
+		Benchmark.Measure(() => worldGen.GenerateChunk(newChunk), "chunk gen");
 
 		return newChunk;
-	}
-
-	protected void Benchmark(Action function, string description)
-	{
-		Stopwatch watch = new Stopwatch();
-		watch.Start();
-		function();
-		watch.Stop();
-		UnityEngine.Debug.Log (String.Format (String.Format ("{0} Time:{1:fffffff}", description, watch.Elapsed)));
 	}
 
 	public IEnumerator UpdateChunksAround(Vector3 position, MonoBehaviour coroutineParent)
@@ -149,7 +140,7 @@ public class World
 		IsGenerating = false;
 	}
 
-	public IEnumerator InitialChunkGeneration(Vector3 position, MonoBehaviour coroutineParent)
+	/*public IEnumerator InitialChunkGeneration(Vector3 position, MonoBehaviour coroutineParent)
 	{
 		IsGenerating = true;
 		
@@ -158,7 +149,7 @@ public class World
 		yield return coroutineParent.StartCoroutine(GenerateNewChunksAround(currentChunkPosition));
 
 		IsGenerating = false;
-	}
+	}*/
 
 	protected IEnumerator GenerateNewChunksAround(Index currentChunkPosition)
     {
@@ -188,6 +179,7 @@ public class World
 				for (int z = (currentChunkPosition.Z - renderDistance); z <= (currentChunkPosition.Z + renderDistance); z++)
 				{
 					chunks[x, y, z].ShouldRender = true;
+					yield return null;
 				}	
 			}
 		}

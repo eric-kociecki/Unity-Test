@@ -106,20 +106,18 @@ public class Sparse3DArray<T>
 	/// <param name="item">Item to remove.</param>
 	public bool Remove(T item)
 	{
-		for (int x = 0; x < physicalSize; x++)
+		foreach (KeyValuePair<Index, int> mapEntry in mapper)
 		{
-			if (contents[x] != null)
+			if (contents[mapEntry.Value].Equals(item))
 			{
-				if (contents[x].Equals(item))
-				{
-					contents[x] = default(T);
-					// TODO should the mapper entry be removed as well? probably.
-					Size--;
-					return true;
-				}
+				contents[mapEntry.Value] = default(T); // consider removing
+				mapper.Remove(mapEntry.Key);
+				Size--;
+				return true;
 			}
 		}
 
+		Debug.LogError(String.Format("Tried to remove non-existant object from Sparse3Darray: {0}", item.ToString()));
 		return false;
 	}
 

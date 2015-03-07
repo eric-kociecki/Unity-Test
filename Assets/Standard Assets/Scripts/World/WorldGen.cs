@@ -13,19 +13,13 @@ public class WorldGen
 
 	public virtual void GenerateChunk(Chunk currentChunk)
 	{
-		int chunkX = currentChunk.Location.X;
 		int chunkY = currentChunk.Location.Y;
-		int chunkZ = currentChunk.Location.Z;
 
-		int underBlockID;
 		int newBlockID;
-		int roll;
 
 		Index absolutePosition;
 
 		float noise;
-
-		//currentChunk.blocks = new Block[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
 
 		for (int localX = 0; localX < Chunk.ChunkSize; localX++)
 		{
@@ -35,7 +29,7 @@ public class WorldGen
 				{
 					if (chunkY < 0)
 					{
-						currentChunk.SetDefaultBlock(CreateBlock(Stone.ID));
+						currentChunk.DefaultBlock = CreateBlock(Stone.ID);
 						return;
 					}
 					else if ((chunkY == 0) && (localY == 0))
@@ -46,7 +40,6 @@ public class WorldGen
 					{
 						newBlockID = Air.ID;
 
-						//underBlockID = world.GetBlockAt(chunkX, chunkY, chunkZ, localX, localY - 1, localZ).GetID();
 						absolutePosition = world.ConvertPositionToAbsoluteCoordinates(new Index(localX, localY, localZ), currentChunk.Location);
 
 						noise = Mathf.PerlinNoise(absolutePosition.X / 100f, absolutePosition.Z / 100f) * Chunk.ChunkSize;
@@ -54,26 +47,9 @@ public class WorldGen
 						{
 							newBlockID = Stone.ID;
 						}
-
-						/*if (underBlockID > 0)
-						{
-							roll = rnd.Next(0, 100);
-							
-							if (roll < 30)
-							{
-								newBlockID = underBlockID;
-							}
-							else if (roll < 45)
-							{
-								if (underBlockID == Stone.ID)
-								{
-									newBlockID = Dirt.ID;
-								}
-							}
-						}*/
 					}
 
-					currentChunk.blocks[localX, localY, localZ] = CreateBlock(newBlockID);
+					currentChunk[localX, localY, localZ] = CreateBlock(newBlockID);
 				}	
 			}
 		}
