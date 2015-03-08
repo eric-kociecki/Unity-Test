@@ -40,7 +40,7 @@ public class WorldGen
 					{
 						newBlockID = Air.ID;
 
-						absolutePosition = world.ConvertPositionToAbsoluteCoordinates(new Index(localX, localY, localZ), currentChunk.Location);
+						absolutePosition = World.ConvertPositionToAbsoluteCoordinates(new Index(localX, localY, localZ), currentChunk.Location);
 
 						noise = Mathf.PerlinNoise(absolutePosition.X / 100f, absolutePosition.Z / 100f) * Chunk.ChunkSize;
 						if ((chunkY == 0) && (localY <= noise))

@@ -28,7 +28,6 @@ public class World
     {
 		BlockColors = Resources.Load<Material>("hsv");
 
-
 		chunks = new Sparse3DArray<Chunk>();
 		int chunkArrayLength = (generateDistance * 2) + 1;
 		chunks.ResizeArray(chunkArrayLength * chunkArrayLength * chunkArrayLength);
@@ -41,7 +40,6 @@ public class World
     public Block GetBlockAt(int x, int y, int z)
     {
 		Index chunkPosition = ConvertPositionToChunkCoordinates(new Vector3(x, y, z));
-		Index localPosition = ConvertPositionToLocalCoordinates(new Vector3(x, y, z));
 
 		if (chunks[chunkPosition] == null)
 		{
@@ -49,6 +47,8 @@ public class World
 		}
 		else
 		{
+			Index localPosition = ConvertPositionToLocalCoordinates(new Vector3(x, y, z));
+
 			return chunks[chunkPosition][localPosition];
 		}
     }
@@ -83,14 +83,14 @@ public class World
 		}
 	}
 
-	public Index ConvertPositionToChunkCoordinates(Vector3 position)
+	public static Index ConvertPositionToChunkCoordinates(Vector3 position)
 	{
 		return new Index((int)Math.Floor(position.x / Chunk.ChunkSize),
 						 (int)Math.Floor(position.y / Chunk.ChunkSize),
 		                 (int)Math.Floor(position.z / Chunk.ChunkSize));
 	}
 
-	public Index ConvertPositionToLocalCoordinates(Vector3 position)
+	public static Index ConvertPositionToLocalCoordinates(Vector3 position)
 	{
 		Index chunkCoords = ConvertPositionToChunkCoordinates(position);
 
@@ -99,7 +99,7 @@ public class World
 		                 (int)position.z - (chunkCoords.Z * Chunk.ChunkSize));
 	}
 
-	public Index ConvertPositionToAbsoluteCoordinates(Index localPosition, Index chunkPosition)
+	public static Index ConvertPositionToAbsoluteCoordinates(Index localPosition, Index chunkPosition)
 	{
 		return new Index((chunkPosition.X * Chunk.ChunkSize) + localPosition.X,
 		                 (chunkPosition.Y * Chunk.ChunkSize) + localPosition.Y,

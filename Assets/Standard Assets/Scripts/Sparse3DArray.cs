@@ -8,17 +8,23 @@ using System.Collections.Generic;
 /// </summary>
 public class Sparse3DArray<T>
 {
+	/// <summary>
+	/// The size of the underlying array. This can change as objects are added to the array. This differs from the logical size as some of the
+	/// objects may be null placeholders.
+	/// </summary>
 	protected int physicalSize = 0;
 
 	/// <summary>
 	/// The number of empty spaces in the underlying array immediately after a resize. Making this larger will help prevent resizes when more objects are added, but will take up more space. Also, growing the array is kinda slow.
 	/// </summary>
-	protected int bufferSize = 1;
+	protected static int bufferSize = 1;
 
 	protected T[] contents;
 	protected Dictionary<Index, int> mapper;
 
 	protected T filler;
+
+	private System.Object threadLock = new System.Object();
 
 	public int Size	{ get; protected set; }
 	
@@ -48,32 +54,44 @@ public class Sparse3DArray<T>
 	
 	public Sparse3DArray()
 	{
-		contents = new T[bufferSize];
-		mapper = new Dictionary<Index, int>();
-		filler = default(T);
+		lock (threadLock)
+		{
+			contents = new T[bufferSize];
+			mapper = new Dictionary<Index, int>();
+			filler = default(T);
+		}
 	}
 	
 	protected bool GetPhysicalAddress(Index logical, out int physical)
 	{
-		return mapper.TryGetValue (logical, out physical);
+		lock (threadLock)
+		{
+			return mapper.TryGetValue (logical, out physical);
+		}
 	}
 
 	public void SetDefault(T newDefault)
 	{
-		filler = newDefault;
+		lock (threadLock)
+		{
+			filler = newDefault;
+		}
 	}
 	
 	public T GetItem(Index logical)
 	{
 		int physical;
-		
-		if (GetPhysicalAddress(logical, out physical))
+
+		lock (threadLock)
 		{
-			return contents[physical];
-		}
-		else
-		{
-			return filler;
+			if (GetPhysicalAddress(logical, out physical))
+			{
+				return contents[physical];
+			}
+			else
+			{
+				return filler;
+			}
 		}
 	}
 	
@@ -83,21 +101,27 @@ public class Sparse3DArray<T>
 	/// <param name="newChunk">New item.</param>
 	public void Add(Index logicalAddress, T newItem)
 	{
-		// find an empty spot
-		int physicalAddress = GetEmptyPhysicalAddress();
-		
-		AddAtPhysical(newItem, logicalAddress, physicalAddress);
+		lock (threadLock)
+		{
+			// find an empty spot
+			int physicalAddress = GetEmptyPhysicalAddress();
+			
+			AddAtPhysical(newItem, logicalAddress, physicalAddress);
+		}
 	}
 
 	protected void AddAtPhysical(T newItem, Index logical, int physicalAddress)
 	{
-		// store the chunk in given index
-		contents[physicalAddress] = newItem;
-		
-		// map the chunk coords to the stored spot
-		mapper.Add(logical, physicalAddress);
+		lock (threadLock)
+		{
+			// store the chunk in given index
+			contents[physicalAddress] = newItem;
+			
+			// map the chunk coords to the stored spot
+			mapper.Add(logical, physicalAddress);
 
-		Size++;
+			Size++;
+		}
 	}
 
 	/// <summary>
@@ -106,14 +130,17 @@ public class Sparse3DArray<T>
 	/// <param name="item">Item to remove.</param>
 	public bool Remove(T item)
 	{
-		foreach (KeyValuePair<Index, int> mapEntry in mapper)
+		lock (threadLock)
 		{
-			if (contents[mapEntry.Value].Equals(item))
+			foreach (KeyValuePair<Index, int> mapEntry in mapper)
 			{
-				contents[mapEntry.Value] = default(T); // consider removing
-				mapper.Remove(mapEntry.Key);
-				Size--;
-				return true;
+				if (contents[mapEntry.Value].Equals(item))
+				{
+					contents[mapEntry.Value] = default(T); // consider removing
+					mapper.Remove(mapEntry.Key);
+					Size--;
+					return true;
+				}
 			}
 		}
 
@@ -128,39 +155,47 @@ public class Sparse3DArray<T>
 	public bool RemoveAt(Index logical)
 	{
 		int physicalAddress;
-		
-		if (GetPhysicalAddress(logical, out physicalAddress))
-		{
-			contents[physicalAddress] = default(T);
-			mapper.Remove(logical);
-			
-			Size--;
 
-			return true;
-		}
-		else
+		lock (threadLock)
 		{
-			// TODO deal with this
-			return false;
-		}
+			if (GetPhysicalAddress(logical, out physicalAddress))
+			{
+				contents[physicalAddress] = default(T);
+				mapper.Remove(logical);
+				
+				Size--;
 		
+				return true;
+			}
+			else
+			{
+				// TODO deal with this
+				return false;
+			}
+		}
+
 	}
 	
 	protected int GetEmptyPhysicalAddress()
 	{
-		for (int x = 0; x < physicalSize; x++)
+		int emptyAddress;
+
+		lock (threadLock)
 		{
-			if (contents[x] == null)
+			for (int x = 0; x < physicalSize; x++)
 			{
-				return x;
+				if (contents[x] == null)
+				{
+					return x;
+				}
 			}
+		
+			// store this value as the index to return after we make some space
+			emptyAddress = physicalSize;
+
+			// make some space
+			ResizeArray(physicalSize + bufferSize + 1);
 		}
-
-		// store this value as the index to return after we make some space
-		int emptyAddress = physicalSize;
-
-		// make some space
-		ResizeArray(physicalSize + bufferSize + 1);
 
 		return emptyAddress;
 	}
@@ -171,7 +206,10 @@ public class Sparse3DArray<T>
 	/// <returns>All chunks stored.</returns>
 	public T[] ToArray()
 	{
-		return contents;
+		lock (threadLock)
+		{
+			return contents;
+		}
 	}
 
 	/// <summary>
@@ -180,25 +218,28 @@ public class Sparse3DArray<T>
 	/// <param name="newSize">New size.</param>
 	public void ResizeArray(int newSize)
 	{
-		//Debug.Log (String.Format("New Sparse3DArray size of {0}. Old size was {1}.", newSize, physicalSize));
-		if (newSize > physicalSize)
+		lock (threadLock)
 		{
-			// store old array
-			T[] oldContents = contents;
-
-			// create larger array
-			contents = new T[newSize];
-			physicalSize = newSize;
-
-			// copy contents into new array
-			for (int x = 0; x < oldContents.Length; x++)
+			//Debug.Log (String.Format("New Sparse3DArray size of {0}. Old size was {1}.", newSize, physicalSize));
+			if (newSize > physicalSize)
 			{
-				contents[x] = oldContents[x];
+				// store old array
+				T[] oldContents = contents;
+
+				// create larger array
+				contents = new T[newSize];
+				physicalSize = newSize;
+
+				// copy contents into new array
+				for (int x = 0; x < oldContents.Length; x++)
+				{
+					contents[x] = oldContents[x];
+				}
 			}
-		}
-		else
-		{
-			Debug.Log (String.Format("New Sparse3DArray size of {0} is invalid. Old size was {1}.", newSize, physicalSize));
+			else
+			{
+				Debug.Log (String.Format("New Sparse3DArray size of {0} is invalid. Old size was {1}.", newSize, physicalSize));
+			}
 		}
 	}
 }
