@@ -45,11 +45,15 @@ public class MeshData
     {
         vertices.Add(vertex);
 
+		if (vertices.Count > 64000)
+		{
+			Debug.Log ("lots o vertices");
+		}
+
         if (useRenderDataForCol)
         {
             colVertices.Add(vertex);
         }
-
     }
 
     // not currently used

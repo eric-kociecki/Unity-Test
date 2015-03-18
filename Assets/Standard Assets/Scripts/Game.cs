@@ -12,9 +12,9 @@ public class Game : MonoBehaviour {
 	// Use this for initialization
 	IEnumerator Start ()
 	{
-		world = new World();
 		player = GameObject.Find("Player");
 		player.SetActive(false);
+		world = new World(player.transform.position);
 		yield return StartCoroutine(world.UpdateChunksAround(player.transform.position, this));
 		player.SetActive(true);
 	}
@@ -26,5 +26,10 @@ public class Game : MonoBehaviour {
 		{
 			StartCoroutine(world.UpdateChunksAround(player.transform.position, this));
 		}
+	}
+
+	void OnApplicationQuit()
+	{
+		world.isRunning = false;
 	}
 }

@@ -18,8 +18,8 @@ public class Stone : Block
 
 	public Stone () : base ()
 	{
-        colorUV = new Vector2((Random.value / 10) + 0.1f,
-                              (Random.value / 10) + 0.1f);
+        colorUV = new Vector2(0.05f + 0.1f,
+                              0.05f + 0.1f);
 	}
 
 	public override int GetID()
