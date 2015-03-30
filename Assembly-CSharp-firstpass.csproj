@@ -56,6 +56,12 @@
      <Compile Include="Assets\Standard Assets\Scripts\Game.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\MeshData.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Pathfinding\BreadCrumb.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Pathfinding\MinHeap.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Pathfinding\Node.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Pathfinding\PathFinder.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Pathfinding\Point3D.cs" />
+     <Compile Include="Assets\Standard Assets\Scripts\Pathfinding\Properties\AssemblyInfo.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\PlayerAnimationState.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\World.cs" />
      <Compile Include="Assets\Standard Assets\Scripts\WorldGen.cs" />

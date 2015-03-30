@@ -1,8 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Standard Assets\Scripts\WorldGen.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Standard Assets\Scripts\Pathfinding\Node.cs">
     <Files>
-      <File FileName="Assets\Standard Assets\Scripts\EnemyAI.cs" Line="1" Column="1" />
+      <File FileName="Assets\Standard Assets\Scripts\EnemyAI.cs" Line="2" Column="26" />
       <File FileName="Assets\Standard Assets\Scripts\Game.cs" Line="1" Column="1" />
       <File FileName="Assets\Standard Assets\Scripts\World.cs" Line="1" Column="1" />
       <File FileName="Assets\Standard Assets\Scripts\Chunk.cs" Line="1" Column="1" />
@@ -14,6 +14,7 @@
       <File FileName="Assets\Standard Assets\Character Controllers\Sources\Scripts\CharacterMotor.js" Line="1" Column="1" />
       <File FileName="Assets\Standard Assets\Scripts\PlayerAnimationState.cs" Line="1" Column="1" />
       <File FileName="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" Line="1" Column="1" />
+      <File FileName="Assets\Standard Assets\Scripts\Pathfinding\Node.cs" Line="52" Column="16" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

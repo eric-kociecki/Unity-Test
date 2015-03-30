@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Tests;
 using UnityEngine;
 
 /// <summary>
@@ -65,6 +66,17 @@ public class World
         }
 
         return Blocks[x, y, z];
+    }
+
+    public bool PositionIsFree(Point3D position)
+    {
+        if (!GetBlockAt((int)position.X, (int)position.Y, (int)position.Z).IsSolid(Block.Direction.up) 
+            && !GetBlockAt((int)position.X, (int)position.Y + 1, (int)position.Z).IsSolid(Block.Direction.up))
+        {
+            return true;
+        }
+
+        return false;
     }
 
 	// Update is called once per frame
