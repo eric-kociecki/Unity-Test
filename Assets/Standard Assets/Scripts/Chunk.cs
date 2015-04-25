@@ -108,7 +108,7 @@ public class Chunk : MonoBehaviour
 
         meshCollider.sharedMesh = mesh;
 
-		renderer.material = world.BlockColors;
+		GetComponent<Renderer>().material = world.BlockColors;
     }
 
 }

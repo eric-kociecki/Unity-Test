@@ -6,7 +6,7 @@ using System.Collections;
 /// </summary>
 public class Game : MonoBehaviour {
 
-	World world;
+	private World world;
 
 	//Entity[] entities;
 
@@ -15,6 +15,11 @@ public class Game : MonoBehaviour {
 	{
 		world = new World();
 	}
+
+    public World getWorld()
+    {
+        return world;
+    }
 	
 	// Update is called once per frame
 	void Update () {
